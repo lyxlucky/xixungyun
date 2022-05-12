@@ -1,7 +1,7 @@
 ### 命令行运行
 
 ```bash
-java -jar java -jar xixunyun-0.0.1-SNAPSHOT.jar --xixunyun.username=习讯云账号 -- xixunyun.password=密码 --pushplus.token=推送token
+java -jar java -jar xixunyun-0.0.1-SNAPSHOT.jar --xixunyun.username=习讯云账号 --xixunyun.password=密码 --pushplus.token=推送token
 ```
 
 ### pushplus
