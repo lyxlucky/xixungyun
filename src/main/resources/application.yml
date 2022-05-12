@@ -1,0 +1,9 @@
+xixunyun:
+  username: xxxx
+  password: xxxx
+  #school_id£¬  106:Éú»ú
+  school: 106
+
+#ÍÆËÍtoken ¹ÙÍø£ºhttps://pushplus.plus/
+pushplus:
+  token: xxxxx
