@@ -84,20 +84,20 @@ public class XixunyunServices {
     }
 
 
-//    @Scheduled(cron = "0 0 20 1/1 1/1 ? *")
+    @Scheduled(cron = "0 0 20 1/1 1/1 ? *")
     public void daySign(){
         String todayAndEndDay = new SimpleDateFormat("yyyy/MM/dd").format(new Date());
         commonSign("day",todayAndEndDay,todayAndEndDay);
     }
 
-//    @Scheduled(cron = "0 0 0 1/7 1/1 ? ")
+    @Scheduled(cron = "0 0 20 1/7 1/1 ?")
     public void weekSign(){
         String weekStartTime = LocalDate.now().with(DayOfWeek.of(1)).atStartOfDay().format(DateTimeFormatter.ISO_LOCAL_DATE).replace("-","/");
         String weekEndTime = LocalDateTime.now().getYear()+"/"+LocalDateTime.now().getMonthValue()+"/"+String.valueOf(Integer.parseInt(weekStartTime.split("/")[2]) + 6);
         commonSign("week",weekStartTime,weekEndTime);
     }
 
-//    @Scheduled(cron = "0 0 0 20 1/1 ? ")
+    @Scheduled(cron = "0 0 18 20 1/1 ?")
     public void monthSign(){
         Calendar a = Calendar.getInstance();
         //把日期设置为当月第一天
@@ -112,9 +112,7 @@ public class XixunyunServices {
         commonSign("month",monthStartTime,monthEndTime);
     }
 
-//    @Scheduled(cron = "0 0 06 1/1 1/1 ? *")
-        @Scheduled(cron = "0/10 * * * * ?")
-
+    @Scheduled(cron = "0 0 06 1/1 1/1 ? *")
     public void everyDaySign(){
         String token = login();
         Map<String, Object> map = everyDaySignMap(token);
@@ -160,9 +158,7 @@ public class XixunyunServices {
     }
 
 
-//    @Scheduled(cron = "0 0 08 1/1 1/1 ? *")
-        @Scheduled(cron = "0/10 * * * * ?")
-
+    @Scheduled(cron = "0 0 08 1/1 1/1 ? *")
     public void everyHealthSign(){
         String token = login();
         Map<String, Object> map = healthSignMap();
