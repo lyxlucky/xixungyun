@@ -140,8 +140,8 @@ public class XixunyunServices {
      */
     public Map<String,Object> everyDaySignMap(String token){
         HashMap<String, Object> map = new HashMap<>(16);
-        map.put("address","%E6%B9%96%E5%8D%97%E7%9C%81%E9%95%BF%E6%B2%99%E5%B8%82%E6%9C%9B%E5%9F%8E%E5%8C%BA%E9%87%91%E5%B1%B1%E6%A1%A5%E8%A1%97%E9%81%93%E6%99%AE%E7%91%9E%E8%A5%BF%E8%B7%AF139%E5%8F%B7");
-        map.put("address_name","%E6%AC%A7%E6%9F%8F%E6%B3%B0%E5%85%8B%E8%BD%AF%E4%BB%B6%E5%AD%A6%E9%99%A2");
+        map.put("address","湖南省长沙市望城区金山桥街道普瑞西路139号");
+        map.put("address_name","欧柏泰克软件学院");
         map.put("change_sign_resource","0");
         map.put("from","app");
         map.put("latitude","oMT3AGrkGMhlZSg5aHegsJsADm/BykZqEOQlJS4mBajlBF4BfGqXnBKs%2BfumA4Bi5PLRX%2B8DTRL/UhTJefrI6HNiVY0dI7fobaVPVs5V7CtNtlMAKov0LVMUR04TopiUi4glWDjkrWYbTsu6X5dHHio5h5WNjvcxzgZZpoah6r0%3D");
