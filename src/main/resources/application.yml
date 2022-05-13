@@ -1,9 +1,13 @@
 xixunyun:
-  username: xxxx
-  password: xxxx
-  #school_id£¬  106:Éú»ú
+  username: 201914336236
+  password: 336236
+  #school_id  106:ç”Ÿæœº
   school: 106
+  #ç´§æ€¥è”ç³»äººå§“å
+  familyName: æç´ è´
+  #ç´§æ€¥è”ç³»äººç”µè¯
+  familyPhone: 15080830671
 
-#ÍÆËÍtoken ¹ÙÍø£ºhttps://pushplus.plus/
+#pushplues:token https://pushplus.plus/
 pushplus:
-  token: xxxxx
+  token: adeef70dc0ed4dc9bfa9634c302c443f

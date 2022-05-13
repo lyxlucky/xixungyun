@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 @Data
 @Component
 @ConfigurationProperties(prefix = "weeksign")
-@PropertySource(encoding = "GBK" ,value = "classpath:config/week.properties",ignoreResourceNotFound = true)
+@PropertySource(encoding = "utf-8" ,value = "classpath:config/week.properties",ignoreResourceNotFound = true)
 public class WeekSign {
 
     private String situation;

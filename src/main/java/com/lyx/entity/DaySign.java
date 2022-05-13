@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 @Data
 @Component
 @ConfigurationProperties(prefix = "daysign")
-@PropertySource(encoding = "GBK" ,value = "classpath:config/day.properties",ignoreResourceNotFound = true)
+@PropertySource(encoding = "utf-8" ,value = "classpath:config/day.properties",ignoreResourceNotFound = true)
 public class DaySign {
 
     private String situation;

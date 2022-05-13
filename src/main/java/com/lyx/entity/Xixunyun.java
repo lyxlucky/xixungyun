@@ -12,9 +12,10 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "xixunyun")
 @Data
 public class Xixunyun {
-
     private String username;
     private String password;
     private String school;
+    private String familyName;
+    private String familyPhone;
 
 }

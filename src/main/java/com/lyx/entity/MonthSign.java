@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 @Data
 @Component
 @ConfigurationProperties(prefix = "monthsign")
-@PropertySource(encoding = "GBK" ,value = "classpath:config/month.properties",ignoreResourceNotFound = true)
+@PropertySource(encoding = "utf-8" ,value = "classpath:config/month.properties",ignoreResourceNotFound = true)
 public class MonthSign {
 
     private String situation;

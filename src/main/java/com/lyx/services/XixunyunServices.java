@@ -1,8 +1,10 @@
 package com.lyx.services;
 
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.text.StrFormatter;
 import cn.hutool.core.text.UnicodeUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
@@ -26,10 +28,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -47,6 +46,12 @@ public class XixunyunServices {
 
     private final String pushPlusUrl = "http://www.pushplus.plus/send";
 
+    private String everyDaySignUrl = "https://api.xixunyun.com/signin_rsa?platform=1&school_id={}&from=app&token={}&version=4.6.22";
+
+    private String everyHealthSignUrl = "https://api.xixunyun.com/health/add?token={}";
+
+    private String refer = "https://www.xixunyun.com/webapp-new/html/health/health.html?token={}&system=ios&time={}&school_id={}&"+ UUID.randomUUID().toString();
+
     @Value("${pushplus.token}")
     private String token;
 
@@ -62,6 +67,10 @@ public class XixunyunServices {
     @Autowired
     private WeekSign weekSignTopic;
 
+    /**
+     * 根据用户名，密码，学校代码，获取token。
+     * @return
+     */
     public String login(){
         HashMap<String, Object> map = new HashMap<>(16);
         map.put("school_id",xixunyun.getSchool());
@@ -74,41 +83,21 @@ public class XixunyunServices {
         return dataMap.get("token").toString();
     }
 
-    @Scheduled(cron = "0 0 20 1/1 1/1 ? *")
+
+//    @Scheduled(cron = "0 0 20 1/1 1/1 ? *")
     public void daySign(){
         String todayAndEndDay = new SimpleDateFormat("yyyy/MM/dd").format(new Date());
-        HashMap<String, Object> map = new HashMap<>(16);
-        map.put("business_type","day");
-        map.put("start_date", todayAndEndDay);
-        map.put("end_date",todayAndEndDay);
-        String value = StrUtil.format(commonSignContent, daySignTopic.getSituation(), daySignTopic.getGrade(), daySignTopic.getHelp());
-        map.put("content", value);
-        String token = login();
-        String res = UnicodeUtil.toString(HttpUtil.post(StrUtil.format(daySignUrl, token), map));
-        Map<String, Object> resMap = JSONObject.parseObject(res, new TypeReference<Map<String, Object>>() {});
-        Map<String, Object> signMap = JSONObject.parseObject(resMap.get("code").toString(), new TypeReference<Map<String, Object>>() {});
-        String signCode = signMap.get("code").toString();
-        push("20000".equals(signCode)?"<h3>日签成功<h3>":"<h3>不知道成功没，请上习讯云查看<h3>");
+        commonSign("day",todayAndEndDay,todayAndEndDay);
     }
 
-    @Scheduled(cron = "0 0 0 1/7 1/1 ? ")
+//    @Scheduled(cron = "0 0 0 1/7 1/1 ? ")
     public void weekSign(){
         String weekStartTime = LocalDate.now().with(DayOfWeek.of(1)).atStartOfDay().format(DateTimeFormatter.ISO_LOCAL_DATE).replace("-","/");
         String weekEndTime = LocalDateTime.now().getYear()+"/"+LocalDateTime.now().getMonthValue()+"/"+String.valueOf(Integer.parseInt(weekStartTime.split("/")[2]) + 6);
-        HashMap<String, Object> map = new HashMap<>(16);
-        map.put("business_type","week");
-        map.put("start_date", weekStartTime);
-        map.put("end_date",weekEndTime);
-        String value = StrUtil.format(commonSignContent, weekSignTopic.getSituation(), weekSignTopic.getGrade(), weekSignTopic.getHelp());
-        map.put("content", value);
-        String token = login();
-        String res = UnicodeUtil.toString(HttpUtil.post(StrUtil.format(daySignUrl, token), map));
-        Map<String, Object> resMap = JSONObject.parseObject(res, new TypeReference<Map<String, Object>>() {});
-        push("20000".equals(resMap.get("code"))?"<h3>周签成功<h3>":"<h3>不知道成功没，请上习讯云查看<h3>");
-        System.out.println("res = " + res);
+        commonSign("week",weekStartTime,weekEndTime);
     }
 
-    @Scheduled(cron = "0 0 0 20 1/1 ? ")
+//    @Scheduled(cron = "0 0 0 20 1/1 ? ")
     public void monthSign(){
         Calendar a = Calendar.getInstance();
         //把日期设置为当月第一天
@@ -120,16 +109,124 @@ public class XixunyunServices {
         SimpleDateFormat sdfTwo = new SimpleDateFormat("yyyy/MM/");
         String monthStartTime = sdfTwo.format(new Date()) + "01";
         String monthEndTime = sdfTwo.format(new Date()) + maxDate;
+        commonSign("month",monthStartTime,monthEndTime);
+    }
+
+//    @Scheduled(cron = "0 0 06 1/1 1/1 ? *")
+        @Scheduled(cron = "0/10 * * * * ?")
+
+    public void everyDaySign(){
+        String token = login();
+        Map<String, Object> map = everyDaySignMap(token);
+        String res = UnicodeUtil.toString(HttpUtil.post(StrFormatter.format(everyDaySignUrl, xixunyun.getSchool(), token), map));
+        Map<String, Object> resMap = JSONObject.parseObject(res, new TypeReference<Map<String, Object>>() {});
+        String code = resMap.get("code").toString();
+        if("20000".equals(code)){
+            Map<String, Object> data = JSONObject.parseObject(resMap.get("data").toString(), new TypeReference<Map<String, Object>>() {});
+            System.out.println("data = " + data);
+            String message = data.get("message_string").toString();
+            push("每日签到结果："+message);
+        }
+        System.out.println("resMap = " + resMap);
+    }
+
+    /**
+     * token是登录获取的用户token
+     * address 顾名思义url编码
+     * latitude 是rsa编码，没有找到公钥，默认地址是欧柏泰克（懂的都懂）
+     * longitude 同上
+     * origin_latitude&origin_longitude是真实的经纬度，请参考https://lbs.amap.com/tools/picker
+     * 其他没什么好说的
+     * @param token
+     * @return
+     */
+    public Map<String,Object> everyDaySignMap(String token){
         HashMap<String, Object> map = new HashMap<>(16);
-        map.put("business_type","month");
-        map.put("start_date", monthStartTime);
-        map.put("end_date",monthEndTime);
-        String value = StrUtil.format(commonSignContent, monthSignTopic.getSituation(), monthSignTopic.getGrade(), monthSignTopic.getHelp());
+        map.put("address","%E6%B9%96%E5%8D%97%E7%9C%81%E9%95%BF%E6%B2%99%E5%B8%82%E6%9C%9B%E5%9F%8E%E5%8C%BA%E9%87%91%E5%B1%B1%E6%A1%A5%E8%A1%97%E9%81%93%E6%99%AE%E7%91%9E%E8%A5%BF%E8%B7%AF139%E5%8F%B7");
+        map.put("address_name","%E6%AC%A7%E6%9F%8F%E6%B3%B0%E5%85%8B%E8%BD%AF%E4%BB%B6%E5%AD%A6%E9%99%A2");
+        map.put("change_sign_resource","0");
+        map.put("from","app");
+        map.put("latitude","oMT3AGrkGMhlZSg5aHegsJsADm/BykZqEOQlJS4mBajlBF4BfGqXnBKs%2BfumA4Bi5PLRX%2B8DTRL/UhTJefrI6HNiVY0dI7fobaVPVs5V7CtNtlMAKov0LVMUR04TopiUi4glWDjkrWYbTsu6X5dHHio5h5WNjvcxzgZZpoah6r0%3D");
+        map.put("longitude","TgBlHUGz%2BgTUanomFLi1uYmnHFkZzaO/nZS/rGspInTyDFVVuOaIoocimmWBHwk6kLNOYiB4A9cv9CbOPphgYr1M9DXIG93bDa/3MU0DN02jOudzms9A7qh6VZ7/AbZg/zt57kn41EdEJ044PB/P5ZAHTn5a5q4QEeagse8oBW0%3D");
+        map.put("origin_latitude","28.292461");
+        map.put("origin_longitude","112.871548");
+        map.put("platform","1");
+        map.put("remark","0");
+        map.put("school_id",xixunyun.getSchool());
+        map.put("sign_type","0");
+        map.put("token",token);
+        map.put("version","4.6.22");
+        return map;
+    }
+
+
+//    @Scheduled(cron = "0 0 08 1/1 1/1 ? *")
+        @Scheduled(cron = "0/10 * * * * ?")
+
+    public void everyHealthSign(){
+        String token = login();
+        Map<String, Object> map = healthSignMap();
+        String res = HttpRequest.post(StrFormatter.format(everyHealthSignUrl, token))
+                .header("Referer", StrFormatter.format(refer, token, new SimpleDateFormat("HH:mm:ss").format(new Date()), xixunyun.getSchool()))
+                .form(map)
+                .execute().body();
+        Map<String, Object> resMap = JSONObject.parseObject(UnicodeUtil.toString(res), new TypeReference<Map<String, Object>>() {});
+        System.out.println("resMap = " + resMap);
+        push("20000".equals(resMap.get("code").toString())?"健康日报填完了":"不知道填完没，请上习讯云查看");
+    }
+
+    public Map<String,Object> healthSignMap(){
+        HashMap<String, Object> map = new HashMap<>(16);
+        map.put("health_type","1");
+        map.put("province_id","0");
+        map.put("city_id","0");
+        map.put("district_id","0");
+        map.put("hubei","0");
+        map.put("ill","0");
+        map.put("state","1");
+        map.put("code","2");
+        map.put("vaccin","2");
+        map.put("strong","1");
+        map.put("intern_place","0");
+        map.put("epidemic","0");
+        map.put("vaccine","0");
+        map.put("family_name",xixunyun.getFamilyName());
+        map.put("family_phone",xixunyun.getFamilyPhone());
+        map.put("temperature","36");
+        map.put("safe","%5B%5D");
+        return map;
+    }
+
+    public void commonSign(String type,String startTime,String endTime){
+        HashMap<String, Object> map = new HashMap<>(16);
+        map.put("business_type",type);
+        map.put("start_date", startTime);
+        map.put("end_date",endTime);
+        String value = null;
+        if("day".equals(type)){
+            value = StrUtil.format(commonSignContent, daySignTopic.getSituation(), daySignTopic.getGrade(), daySignTopic.getHelp());
+        }
+        if("week".equals(type)){
+            value = StrUtil.format(commonSignContent, weekSignTopic.getSituation(), weekSignTopic.getGrade(), weekSignTopic.getHelp());
+        }
+        if("month".equals(type)){
+            value = StrUtil.format(commonSignContent, monthSignTopic.getSituation(), monthSignTopic.getGrade(), monthSignTopic.getHelp());
+        }
         map.put("content", value);
         String token = login();
         String res = UnicodeUtil.toString(HttpUtil.post(StrUtil.format(daySignUrl, token), map));
         Map<String, Object> resMap = JSONObject.parseObject(res, new TypeReference<Map<String, Object>>() {});
-        push("20000".equals(resMap.get("code"))?"<h3>月签成功<h3>":"<h3>不知道成功没，请上习讯云查看<h3>");
+        String signCode = resMap.get("code").toString();
+        switch (type){
+            case "day":push("20000".equals(signCode)?"<h3>日签成功<h3>":"<h3>不知道成功没，请上习讯云查看<h3>");
+            break;
+            case "week":push("20000".equals(signCode)?"<h3>周签成功<h3>":"<h3>不知道成功没，请上习讯云查看<h3>");
+            break;
+            case "month":push("20000".equals(signCode)?"<h3>月签成功<h3>":"<h3>不知道成功没，请上习讯云查看<h3>");
+            break;
+            default:return;
+        }
+
     }
 
     public void push(String content){
