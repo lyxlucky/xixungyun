@@ -1,21 +1,20 @@
 ### 说明
 
-<<<<<<< HEAD
 本项目为了解放双手而诞生，代码较为粗糙，大佬勿喷，喜欢请给个star，谢谢！
 
 ### 主要功能
 
 #### 日报
 
-默认每天20:00运行，可自定义上传内容，请参考config下的<a href="#">day.properties</a>
+默认每天20:00运行，可自定义上传内容，请参考config下的<a href="https://github.com/2414690715/xixungyun/blob/main/src/main/resources/config/day.properties">day.properties</a>
 
 #### 周报
 
-默认每过七天运行一次，可自定义上传内容，请参考config下的<a href="#">week.properties</a>
+默认每过七天运行一次，可自定义上传内容，请参考config下的<a href="https://github.com/2414690715/xixungyun/blob/main/src/main/resources/config/week.properties">week.properties</a>
 
 #### 月报
 
-默认每月20号18点运行，可自定义上传内容，请参考config下的<a href="#">month.properties</a>
+默认每月20号18点运行，可自定义上传内容，请参考config下的<a href="https://github.com/2414690715/xixungyun/blob/main/src/main/resources/config/month.properties">month.properties</a>
 
 #### 每日签到
 
@@ -24,18 +23,11 @@
 #### 健康日报
 
 默认每天8点运行。
-=======
-本项目只包含了写月报，周报，日报，代码较为粗糙，大佬勿喷。谢谢，喜欢的话，请给个star
->>>>>>> bb5cf05b55525617681d5cf63d4a66151831c44e
 
 ### 命令行运行
 
 ```bash
-<<<<<<< HEAD
 java -jar xixunyun-0.0.1-SNAPSHOT.jar --xixunyun.username=习讯云账号 --xixunyun.password=密码 --pushplus.token=推送token --xixunyun.familyName=紧急联系人姓名 --xixunyun.familyPhone=紧急联系人电话
-=======
-java -jar java -jar xixunyun-0.0.1-SNAPSHOT.jar --xixunyun.username=习讯云账号 --xixunyun.password=密码 --pushplus.token=推送token
->>>>>>> bb5cf05b55525617681d5cf63d4a66151831c44e
 ```
 
 ### pushplus
