@@ -84,7 +84,7 @@ public class XixunyunServices {
     }
 
 
-    @Scheduled(cron = "0 0 20 1/1 1/1 ? *")
+    @Scheduled(cron = "0 0 20 1/1 1/1 ?")
     public void daySign(){
         String todayAndEndDay = new SimpleDateFormat("yyyy/MM/dd").format(new Date());
         commonSign("day",todayAndEndDay,todayAndEndDay);
@@ -112,7 +112,7 @@ public class XixunyunServices {
         commonSign("month",monthStartTime,monthEndTime);
     }
 
-    @Scheduled(cron = "0 0 06 1/1 1/1 ? *")
+    @Scheduled(cron = "0 0 06 1/1 1/1 ?")
     public void everyDaySign(){
         String token = login();
         Map<String, Object> map = everyDaySignMap(token);
@@ -158,7 +158,7 @@ public class XixunyunServices {
     }
 
 
-    @Scheduled(cron = "0 0 08 1/1 1/1 ? *")
+    @Scheduled(cron = "0 0 08 1/1 1/1 ?")
     public void everyHealthSign(){
         String token = login();
         Map<String, Object> map = healthSignMap();
