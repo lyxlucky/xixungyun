@@ -18,11 +18,15 @@
 
 #### 每日签到
 
-默认每天6点运行，暂时不完美，只支持生机的同学使用（懂得都懂）
+默认每天6点运行，支持<a href="https://github.com/2414690715/xixungyun/blob/main/src/main/resources/config/everydaysign.properties">自定义</a>地点和经纬度，经纬度获取请前往<a href="https://lbs.amap.com/tools/picker">here</a>
 
 #### 健康日报
 
-默认每天8点运行。
+默认每天8点运行，健康参数都为健康（除非你不健康）否则不是很需要定义参数，只需填写紧急联系人和手机号。
+
+#### 推送
+
+完成了什么功能会推送到手机上，详情请往下看。
 
 ### 命令行运行
 
@@ -45,6 +49,8 @@ pushplus(推送加)是集成了微信、企业微信、钉钉、短信、邮件�
 ### Docker
 
 ![image-20220513121210017](https://cdn.jsdelivr.net/gh/2414690715/imgPool/img/202205130e1bf578e25a836b45f466fcf25dcaea-a5cd17.png)
+
+修改Dockerfile文件：
 
 ```bash
 把Dockerfile和Jar包单独放到一个文件夹

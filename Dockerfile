@@ -7,5 +7,7 @@ VOLUME /tmp
 ADD xixunyun-0.0.1-SNAPSHOT.jar lyx_docker.jar
 # 运行jar包
 RUN bash -c 'touch /lyx_docker.jar'
+RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+RUN echo ‘Asia/Shanghai’ >/etc/timezone
 #推送token 官网：https://pushplus.plus/
-ENTRYPOINT ["java","-jar","/lyx_docker.jar","--xixunyun.username=你的用户名","--xixunyun.password=你的密码","--pushplus.token=你的token","--xixunyun.familyName=紧急联系人姓名","--xixunyun.familyPhone=紧急联系人电话"]
+ENTRYPOINT ["java","-jar","/lyx_docker.jar","--xixunyun.username=习讯云账号","--xixunyun.password=习讯云密码","--pushplus.token=pushPlustoken","--xixunyun.familyName=紧急联系人姓名","--xixunyun.familyPhone=电话"]

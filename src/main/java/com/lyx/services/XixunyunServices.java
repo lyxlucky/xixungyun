@@ -3,17 +3,17 @@ package com.lyx.services;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.text.StrFormatter;
 import cn.hutool.core.text.UnicodeUtil;
+import cn.hutool.core.util.CharsetUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.crypto.asymmetric.KeyType;
+import cn.hutool.crypto.asymmetric.RSA;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
-import com.lyx.entity.DaySign;
-import com.lyx.entity.MonthSign;
-import com.lyx.entity.WeekSign;
-import com.lyx.entity.Xixunyun;
+import com.lyx.entity.*;
 import org.apache.tomcat.util.buf.Utf8Encoder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -52,6 +52,12 @@ public class XixunyunServices {
 
     private String refer = "https://www.xixunyun.com/webapp-new/html/health/health.html?token={}&system=ios&time={}&school_id={}&"+ UUID.randomUUID().toString();
 
+    private final String RSA_PUBLIC_KEY =
+            "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDlYsiV3DsG\n" +
+            "+t8OFMLyhdmG2P2J4GJwmwb1rKKcDZmTxEphPiYTeFIg4IFEiqDCA\n" +
+            "TAPHs8UHypphZTK6LlzANyTzl9LjQS6BYVQk81LhQ29dxyrXgwkRw9RdWa\n" +
+            "MPtcXRD4h6ovx6FQjwQlBM5vaHaJOHhEorHOSyd/deTvcS+hRSQIDAQAB";
+
     @Value("${pushplus.token}")
     private String token;
 
@@ -66,6 +72,9 @@ public class XixunyunServices {
 
     @Autowired
     private WeekSign weekSignTopic;
+
+    @Autowired
+    private EveryDaySign everyDaySign;
 
     /**
      * 根据用户名，密码，学校代码，获取token。
@@ -131,7 +140,7 @@ public class XixunyunServices {
     /**
      * token是登录获取的用户token
      * address 顾名思义url编码
-     * latitude 是rsa编码，没有找到公钥，默认地址是欧柏泰克（懂的都懂）
+     * latitude 是rsa加密，详情百度
      * longitude 同上
      * origin_latitude&origin_longitude是真实的经纬度，请参考https://lbs.amap.com/tools/picker
      * 其他没什么好说的
@@ -140,14 +149,15 @@ public class XixunyunServices {
      */
     public Map<String,Object> everyDaySignMap(String token){
         HashMap<String, Object> map = new HashMap<>(16);
-        map.put("address","湖南省长沙市望城区金山桥街道普瑞西路139号");
-        map.put("address_name","欧柏泰克软件学院");
+        map.put("address",everyDaySign.getAddress());
+        map.put("address_name",everyDaySign.getAddressName());
         map.put("change_sign_resource","0");
         map.put("from","app");
-        map.put("latitude","oMT3AGrkGMhlZSg5aHegsJsADm/BykZqEOQlJS4mBajlBF4BfGqXnBKs%2BfumA4Bi5PLRX%2B8DTRL/UhTJefrI6HNiVY0dI7fobaVPVs5V7CtNtlMAKov0LVMUR04TopiUi4glWDjkrWYbTsu6X5dHHio5h5WNjvcxzgZZpoah6r0%3D");
-        map.put("longitude","TgBlHUGz%2BgTUanomFLi1uYmnHFkZzaO/nZS/rGspInTyDFVVuOaIoocimmWBHwk6kLNOYiB4A9cv9CbOPphgYr1M9DXIG93bDa/3MU0DN02jOudzms9A7qh6VZ7/AbZg/zt57kn41EdEJ044PB/P5ZAHTn5a5q4QEeagse8oBW0%3D");
-        map.put("origin_latitude","28.292461");
-        map.put("origin_longitude","112.871548");
+        RSA rsa = new RSA(null,RSA_PUBLIC_KEY);
+        map.put("latitude",String.valueOf(rsa.encrypt(StrUtil.bytes(everyDaySign.getLatitude()),KeyType.PublicKey)));
+        map.put("longitude",String.valueOf(rsa.encrypt(StrUtil.bytes(everyDaySign.getLongitude()),KeyType.PublicKey)));
+        map.put("origin_latitude",everyDaySign.getLatitude());
+        map.put("origin_longitude",everyDaySign.getLongitude());
         map.put("platform","1");
         map.put("remark","0");
         map.put("school_id",xixunyun.getSchool());
