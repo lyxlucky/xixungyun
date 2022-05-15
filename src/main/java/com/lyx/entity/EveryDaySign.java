@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 @Data
 @Component
 @ConfigurationProperties(prefix = "everydaysign")
-@PropertySource(encoding = "utf-8" ,value = "classpath:config/everydaysign.properties",ignoreResourceNotFound = true)
+@PropertySource(encoding = "GBK" ,value = "classpath:config/everydaysign.properties",ignoreResourceNotFound = true)
 public class EveryDaySign {
 
     private String longitude;
